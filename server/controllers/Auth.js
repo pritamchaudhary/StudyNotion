@@ -28,7 +28,7 @@ exports.sendOTP = async (req, res) => {
       lowerCaseAlphabets: false,
       specialChars: false,
     });
-    console.log("OTP generate: ", otp);
+    console.log("OTP generated: ", otp);
 
     // check unique otp or not
     let result = await OTP.findOne({ otp: otp });
@@ -73,6 +73,7 @@ exports.signUp = async (req, res) => {
       email,
       password,
       confirmPassword,
+      accountType,
       contactNumber,
       otp,
     } = req.body;
@@ -121,9 +122,9 @@ exports.signUp = async (req, res) => {
       // OTP not found
       return res.status(400).json({
         success: false,
-        message: "OTP not found",
+        message: "OTP Not Found",
       });
-    } else if (otp !== recentOtp) {
+    } else if (otp !== recentOtp.otp) {
       // invalid otp
       return res.status(400).json({
         success: false,
@@ -148,7 +149,7 @@ exports.signUp = async (req, res) => {
       contactNumber,
       password: hashedPassword,
       accountType,
-      additionalDetails: profileDetails,
+      additionalDetails: profileDetails._id,
       image: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`,
     });
 
@@ -195,9 +196,9 @@ exports.login = async (req, res) => {
       const payload = {
         email: user.email,
         id: user._id,
-        role: user.role,
+        accountType: user.accountType,
       };
-      const token = jwt.sign(paylaod, process.JWT_SECRET, {
+      const token = jwt.sign(payload, process.env.JWT_SECRET, {
         expiresIn: "2h",
       });
       user.token = token;
