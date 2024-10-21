@@ -35,7 +35,7 @@ exports.createCourse = async(req, res) => {
         }
 
         // check given tag is valid or not
-        const categoryDetails = await Tag.findById(tag);
+        const categoryDetails = await Category.findById(tag);
         if(!categoryDetails){
             return res.status(404).json({
                 success: false,
